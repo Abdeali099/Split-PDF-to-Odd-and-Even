@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF Odd/Even Splitter</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10">
+  <!-- PWA & Mobile Install Meta Tags -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1976d2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PDF Odd/Even Splitter">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10">
+  <!-- Manifest for installability -->
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; padding: 0; margin: 0; }
+    .box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 48px 32px;
+      max-width: 440px;
+      margin: 60px auto;
+      box-shadow: 0 6px 32px #0002;
+      text-align: center;
+    }
+    .heading {
+      font-size: 2em;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .desc {
+      font-size: 1.1em;
+      color: #333;
+      margin-bottom: 28px;
+    }
+    input[type="file"] {
+      font-size: 1.25em;
+      margin-bottom: 24px;
+      padding: 8px;
+    }
+    button {
+      font-size: 1.3em;
+      padding: 12px 36px;
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    button[disabled] { background: #aaa; cursor: not-allowed; }
+    .error { color: #d32f2f; font-size: 1.1em; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="heading">PDF Odd/Even Splitter</div>
+    <div class="desc">
+      <div>
+        <b>Odd</b> numbers: 1, 3, 5, 7, ...<br>
+        <b>Even</b> numbers: 2, 4, 6, 8, ...
+      </div>
+      <div style="margin-top:8px;">Splits your PDF pages into two files: odd and even pages.</div>
+    </div>
+    <input type="file" id="pdfInput" accept="application/pdf" />
+    <br>
+    <button id="splitBtn" disabled>Split</button>
+    <div class="error" id="error"></div>
+  </div>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script>
+    const pdfInput = document.getElementById('pdfInput');
+    const splitBtn = document.getElementById('splitBtn');
+    const errorDiv = document.getElementById('error');
+    let pdfBytes = null;
+    let originalName = "output";
+
+    pdfInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file && file.type === 'application/pdf') {
+        pdfBytes = await file.arrayBuffer();
+        originalName = file.name.replace(/\.pdf$/i, '') || "output";
+        splitBtn.disabled = false;
+        errorDiv.textContent = '';
+      } else {
+        pdfBytes = null;
+        splitBtn.disabled = true;
+        errorDiv.textContent = 'Select a PDF file.';
+      }
+    });
+
+    splitBtn.addEventListener('click', async () => {
+      if (!pdfBytes) return;
+      splitBtn.disabled = true;
+      errorDiv.textContent = '';
+      try {
+        const PDFLib = window.PDFLib;
+        const srcDoc = await PDFLib.PDFDocument.load(pdfBytes);
+        const totalPages = srcDoc.getPageCount();
+
+        const oddDoc = await PDFLib.PDFDocument.create();
+        const evenDoc = await PDFLib.PDFDocument.create();
+
+        for (let i = 0; i < totalPages; i++) {
+          if ((i + 1) % 2 === 1) { // Odd pages
+            const [copiedPage] = await oddDoc.copyPages(srcDoc, [i]);
+            oddDoc.addPage(copiedPage);
+          } else { // Even pages
+            const [copiedPage] = await evenDoc.copyPages(srcDoc, [i]);
+            evenDoc.addPage(copiedPage);
+          }
+        }
+
+        // Auto-download files
+        const oddBytes = await oddDoc.save();
+        const evenBytes = await evenDoc.save();
+        autoDownload(new Blob([oddBytes], {type:'application/pdf'}), `${originalName}-odd.pdf`);
+        autoDownload(new Blob([evenBytes], {type:'application/pdf'}), `${originalName}-even.pdf`);
+      } catch (e) {
+        errorDiv.textContent = "Error: " + e.message;
+      } finally {
+        splitBtn.disabled = false;
+      }
+    });
+
+    function autoDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 500);
+    }
+  </script>
+</body>
+</html>
