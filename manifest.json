@@ -1,0 +1,21 @@
+{
+  "name": "PDF Odd/Even Splitter",
+  "short_name": "PDF Splitter",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1976d2",
+  "theme_color": "#1976d2",
+  "description": "Split PDF into odd and even pages easily.",
+  "icons": [
+    {
+      "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
