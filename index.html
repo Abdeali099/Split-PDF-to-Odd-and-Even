@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>PDF Odd/Even Splitter</title>
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10">
+  <link rel="icon" type="image/png"
+    href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10">
   <!-- PWA & Mobile Install Meta Tags -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1976d2">
@@ -12,11 +14,18 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="PDF Odd/Even Splitter">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="apple-touch-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10">
+  <link rel="apple-touch-icon"
+    href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkwfThzUEHAKLMaqLxOH27ByIok6m_9FXxmFRYC33NDJulUSO9_L32PAQn&s=10">
   <!-- Manifest for installability -->
   <link rel="manifest" href="manifest.json">
   <style>
-    body { font-family: sans-serif; background: #f9f9f9; padding: 0; margin: 0; }
+    body {
+      font-family: sans-serif;
+      background: #f9f9f9;
+      padding: 0;
+      margin: 0;
+    }
+
     .box {
       background: #fff;
       border-radius: 12px;
@@ -26,16 +35,19 @@
       box-shadow: 0 6px 32px #0002;
       text-align: center;
     }
+
     .heading {
       font-size: 2em;
       margin-bottom: 10px;
       font-weight: bold;
     }
+
     .desc {
       font-size: 1.1em;
       color: #333;
       margin-bottom: 28px;
     }
+
     .upload-box {
       flex: 1;
       border: 2px dashed #ccc;
@@ -49,11 +61,13 @@
       justify-content: center;
       margin-bottom: 24px;
     }
+
     input[type="file"] {
       font-size: 1.25em;
       padding: 8px;
       margin: auto;
     }
+
     button {
       font-size: 1.3em;
       padding: 12px 36px;
@@ -64,10 +78,20 @@
       cursor: pointer;
       margin-bottom: 12px;
     }
-    button[disabled] { background: #aaa; cursor: not-allowed; }
-    .error { color: #d32f2f; font-size: 1.1em; margin-top: 16px; }
+
+    button[disabled] {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    .error {
+      color: #d32f2f;
+      font-size: 1.1em;
+      margin-top: 16px;
+    }
   </style>
 </head>
+
 <body>
   <div class="box">
     <div class="heading">PDF Odd/Even Splitter</div>
@@ -114,6 +138,13 @@
         const srcDoc = await PDFLib.PDFDocument.load(pdfBytes);
         const totalPages = srcDoc.getPageCount();
 
+        if (totalPages == 1) {
+          alert("Single page PDF detected. Splitting not required.");
+          splitBtn.disabled = false;
+          pdfInput.value = '';
+          return;
+        }
+
         const oddDoc = await PDFLib.PDFDocument.create();
         const evenDoc = await PDFLib.PDFDocument.create();
 
@@ -130,8 +161,8 @@
         // Auto-download files
         const oddBytes = await oddDoc.save();
         const evenBytes = await evenDoc.save();
-        autoDownload(new Blob([oddBytes], {type:'application/pdf'}), `${originalName}-odd.pdf`);
-        autoDownload(new Blob([evenBytes], {type:'application/pdf'}), `${originalName}-even.pdf`);
+        autoDownload(new Blob([oddBytes], { type: 'application/pdf' }), `${originalName}-odd.pdf`);
+        autoDownload(new Blob([evenBytes], { type: 'application/pdf' }), `${originalName}-even.pdf`);
       } catch (e) {
         errorDiv.textContent = "Error: " + e.message;
       } finally {
@@ -153,4 +184,5 @@
     }
   </script>
 </body>
+
 </html>
